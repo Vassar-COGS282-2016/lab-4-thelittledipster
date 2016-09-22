@@ -26,7 +26,7 @@ rbinom(number.of.samples, number.of.trials.per.sample, probability.of.success)
 # of course, ESP doesn't exist, so the probability of a successful guess is 0.50.
 # store the result in a vector called esp.data
 
-esp.data <- NA # answer needed here.
+esp.data <- rbinom(100, 20, .50)
 
 # a quick way to visualize a distribution is with the hist() function:
 hist(esp.data)
@@ -45,7 +45,7 @@ dbinom(value.to.check, number.of.trials, probability.of.success)
 # questions correctly, if they have a 0.9 probability of giving a correct answer
 # for each individual question.
 
-# answer needed here.
+dbinom(87, 100, .9)
 
 # with dbinom, you can use a vector as the first argument, to check the probability
 # of multiple values at the same time:
