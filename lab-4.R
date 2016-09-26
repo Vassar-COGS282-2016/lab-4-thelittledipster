@@ -84,7 +84,7 @@ hist(hist.sample, xlim=c(0,100)) # compare this plot to the line above.
 
 hist.set <- rnorm(100, mean = 0, sd = 10)
 hist(hist.set)
-
+?rnorm
 # now plot the probability density function of this distribution.
 # use the same strategy as you did above with the binomial to find the density of the normal
 # distribution with mean 0 and sd 10 for values between -50 and 50. the distribution is continuous
@@ -146,7 +146,7 @@ ff <- sum(dnorm((rt.sample), mean = 450, sd = 100, log=TRUE))
 
 which.max(c(aa,bb,cc,dd,ee,ff))
 
-ee
+ee #5
 
 # here is a set of data for a subject in a categorization experiment, modeled with GCM.
 # calculate the log likelihood of the parameters in the model (which i am not showing you).
@@ -157,8 +157,14 @@ ee
 
 gcm.practice.data <- data.frame(correct.response = c(T, T, T, T, F, T, T, F, T, T, T, F, F, T, T, F, T, T, T, T),
                                 gcm.probability.correct = c(0.84, 0.80, 0.84, 0.80, 0.79, 0.86, 0.89, 0.87, 0.69, 0.85, 0.75,
-                                                            0.74, 0.82, 0.85, 0.87, 0.69, 0.83, 0.87, 0.80, 0.76))
-
+                                                            0.74, 0.82, 0.85, 0.87, 0.69, 0.83, 0.87, 0.80, 0.76),
+                                likelihood <- mapply(function(prob, response){
+                                  {
+                                  if(prob = T)
+                                  return(gcm.probability.correct)}
+                                  else{
+                                    return(1-gcm.probability.correct)}
+                                })
 # answer needed here.
 
 #### maximum likelihood estimation ####
@@ -173,13 +179,15 @@ same.diff.data <- c(32, 29, 31, 34, 26, 29, 31, 34, 29, 31, 30, 29, 31, 34, 33, 
 # we can model this experiment's data as 40 coin flips for each subject. use grid search to plot the likelihood
 # function for values of theta (probability of a correct response) between 0.5 and 0.9, in steps of 0.01.
 # start by writing a function that calculates the likelihood (not log) for the entire set of data given a value of theta.
+number.of.samples <- 20
+number.of.trials.per.sample <- 40
+probability.of.success <- seq(0.5,0.9,0.01)
 
-# answer needed here.
-
+y <- rbinom(number.of.samples, number.of.trials.per.sample, probability.of.success)
 # then use sapply to run the function for each possible value of theta in the set. use seq() to generate the
 # set of possible values. plot the set of values on the x axis and the corresponding likelihoods on the y axis.
 
-# answer needed here.
+plot(probability.of.success, y)
 
 # the "true" underlying value i used to generate the data was 0.75. does that match up with the grid search?
 
@@ -194,17 +202,20 @@ same.diff.data <- c(32, 29, 31, 34, 26, 29, 31, 34, 29, 31, 30, 29, 31, 34, 33, 
 # create a vector of x values from 0 to 100, and the corresponding vector of y values,
 # then plot these with x values on the x axis, and y values on the y axis.
 
-# answer needed here.
-
+x <- seq(1:100)
+y <- 4 + 0.8*x
+plot(x,y)
 # now let's assume that the relationship between x and y isn't perfect. there's a bit of random
 # noise. add a random sample from a normal distribution with mean 0 and sd 10 to each y value.
 # hint: there are 101 y values, so you need 101 samples.
 
-# answer needed here.
 
 # plot the data again, with the new noisy y values.
 
-# answer needed here.
+
+x <- seq(1:100)
+y <- 4 + 0.8*x + (rnorm(x , mean = 0, sd = 10))
+plot(x,y)
 
 # there are three parameter values that control this plot,
 # the intercept of the line: 4
@@ -213,7 +224,7 @@ same.diff.data <- c(32, 29, 31, 34, 26, 29, 31, 34, 29, 31, 30, 29, 31, 34, 33, 
 
 # say that we observe a point of data, x = 20 and y = 27.
 # the linear equation, y <- 4 + 0.8*x, predicts that when x is 20 y should also be 20.
-4 + 0.8*20
+4 + 0.8*29
 
 # our model of this data assumes that the relationship is not perfect.
 # we assume that there is noise so that when x is 20, the most likely value of y should be 4 + 0.8*x,
@@ -235,13 +246,19 @@ dnorm(y.observed, y.predicted, 10)
 # write the code to see how likely it is that y will be 33 when x is 29? (assuming sd = 10)
 # the correct answer is 0.03371799...
 
-# answer needed here.
-
+x.observed <- 29
+y.predicted <- 4 + 0.8*x.observed
+y.observed <- 33
+dnorm(y.observed, y.predicted, 10)
 # now generalize your solution to compute the likelihood of each value of y that you generated above.
 # in other words, write the code that takes a vector of x and y values, and returns the probability
 # of each pair given that the relationship between x and y is y <- 4 + 0.8*x and the normal distribution has an sd of 10.
+gen.likelihood <- function(x,y){
+x.observed <- x
+y.predicted <- 4 + 0.8*x.observed
+y.observed <- y
+dnorm(y.observed, y.predicted, 10)}
 
-# answer needed here.
 
 # now generalize your solution one step further. write a function that takes in a vector of parameters,
 # where parameters[1] is the intercept, parameters[2] is the slope, and parameters[3] is the sd of the normal,
