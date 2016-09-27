@@ -202,7 +202,7 @@ plot(probability.of.success, y)
 # create a vector of x values from 0 to 100, and the corresponding vector of y values,
 # then plot these with x values on the x axis, and y values on the y axis.
 
-x <- seq(1:100)
+x <- seq(0:100)
 y <- 4 + 0.8*x
 plot(x,y)
 # now let's assume that the relationship between x and y isn't perfect. there's a bit of random
@@ -213,7 +213,7 @@ plot(x,y)
 # plot the data again, with the new noisy y values.
 
 
-x <- seq(1:100)
+x <- seq(0:100)
 y <- 4 + 0.8*x + (rnorm(x , mean = 0, sd = 10))
 plot(x,y)
 
@@ -264,14 +264,26 @@ dnorm(y.observed, y.predicted, 10)}
 # where parameters[1] is the intercept, parameters[2] is the slope, and parameters[3] is the sd of the normal,
 # and returns the total **negative log likelihood**. remember, we want the negative log likelihood because
 # optim() will find the set of parameters that minimizes a function.
-
-# answer needed here.
-
+x.observed <- seq(0,100,1)
+y.observed <- 4 + 0.8*x.observed + (rnorm(x.observed , mean = 0, sd = 10))
+par.likelihood <- function(parameters){
+  i <- parameters[1]
+  s <- parameters[2]
+  sd <- parameters[3]
+  y.predicted <- s*x.observed + i
+  if(sd <= 0){
+    return(NA)}
+  else{
+  neg.log.likelihood <- sum(dnorm(y.observed, mean = y.predicted, sd, log=TRUE))
+  return(neg.log.likelihood)}}
+par.likelihood(c(10,10,10))
 # use optim() and Nelder-Mead to search for the best fitting parameters. remember to ensure that sd > 0
 # and return NA if it is not.
 
-# answer needed here.
-
+fit <- optim(c(1,1,1), par.likelihood, method="Nelder-Mead")
+?optim
 # finally, plot the best fitting line on your points by using the abline() function, and the parameters that optim() found.
 
-# answer needed here.
+plot(x.observed, y.observed)
+abiline(a=4, b=.8, col='red')
+abline(a=fit$par[1], b=fit$par[2], col='blue')
