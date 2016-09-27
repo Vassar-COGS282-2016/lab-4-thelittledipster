@@ -157,15 +157,18 @@ ee #5
 
 gcm.practice.data <- data.frame(correct.response = c(T, T, T, T, F, T, T, F, T, T, T, F, F, T, T, F, T, T, T, T),
                                 gcm.probability.correct = c(0.84, 0.80, 0.84, 0.80, 0.79, 0.86, 0.89, 0.87, 0.69, 0.85, 0.75,
-                                                            0.74, 0.82, 0.85, 0.87, 0.69, 0.83, 0.87, 0.80, 0.76),
-                                likelihood <- mapply(function(prob, response){
-                                  {
-                                  if(prob = T)
-                                  return(gcm.probability.correct)}
+                                                            0.74, 0.82, 0.85, 0.87, 0.69, 0.83, 0.87, 0.80, 0.76))
+                                gcm.practice.data$likelihood <- mapply(function(response, prob){
+                                  
+                                  if(response == T){
+                                  return(prob)}
                                   else{
-                                    return(1-gcm.probability.correct)}
-                                })
-# answer needed here.
+                                    return(1-prob)}
+                                },
+                                gcm.practice.data$correct.response, gcm.practice.data$gcm.probability.correct)
+                                
+                                gcmloglikelihood <- sum(log(gcm.practice.data$likelihood))
+                                
 
 #### maximum likelihood estimation ####
 
@@ -179,15 +182,19 @@ same.diff.data <- c(32, 29, 31, 34, 26, 29, 31, 34, 29, 31, 30, 29, 31, 34, 33, 
 # we can model this experiment's data as 40 coin flips for each subject. use grid search to plot the likelihood
 # function for values of theta (probability of a correct response) between 0.5 and 0.9, in steps of 0.01.
 # start by writing a function that calculates the likelihood (not log) for the entire set of data given a value of theta.
-number.of.samples <- 20
-number.of.trials.per.sample <- 40
-probability.of.success <- seq(0.5,0.9,0.01)
-
-y <- rbinom(number.of.samples, number.of.trials.per.sample, probability.of.success)
+likelihood.grid <- function(theta){
+  like.coin <- dbinom(same.diff.data, 40, theta)
+  return(prod(like.coin))
+}
 # then use sapply to run the function for each possible value of theta in the set. use seq() to generate the
 # set of possible values. plot the set of values on the x axis and the corresponding likelihoods on the y axis.
 
-plot(probability.of.success, y)
+theta.grid <- seq(0.5, 0.9, 0.01)
+parameters <- expand.grid(list(theta=theta.grid))
+parameters$likelihoods <- sapply(theta.grid, function(x) {return(likelihood.grid(x)) })
+best.theta <- max(parameters$likelihoods)
+
+plot(theta.grid, parameters$likelihoods)
 
 # the "true" underlying value i used to generate the data was 0.75. does that match up with the grid search?
 
@@ -274,9 +281,8 @@ par.likelihood <- function(parameters){
   if(sd <= 0){
     return(NA)}
   else{
-  neg.log.likelihood <- sum(dnorm(y.observed, mean = y.predicted, sd, log=TRUE))
+  neg.log.likelihood <- sum(dnorm(y.observed, mean = y.predicted, sd=sd, log=TRUE))
   return(neg.log.likelihood)}}
-par.likelihood(c(10,10,10))
 # use optim() and Nelder-Mead to search for the best fitting parameters. remember to ensure that sd > 0
 # and return NA if it is not.
 
@@ -285,5 +291,5 @@ fit <- optim(c(1,1,1), par.likelihood, method="Nelder-Mead")
 # finally, plot the best fitting line on your points by using the abline() function, and the parameters that optim() found.
 
 plot(x.observed, y.observed)
-abiline(a=4, b=.8, col='red')
+abline(a=4, b=.8, col='red')
 abline(a=fit$par[1], b=fit$par[2], col='blue')
